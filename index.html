@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GitHub User Website for barely-a-dev" />
+  <meta name="keywords" content="GitHub, Developer, barely-a-dev, Projects, Portfolio" />
+  <title>barely-a-dev - Developer Portfolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;700&display=swap"
+    rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="logo-container">
+        <div class="logo">barely-a-dev</div>
+      </div>
+      <nav>
+        <a href="#about"><i class="fas fa-user"></i> About</a>
+        <a href="#projects"><i class="fas fa-code"></i> Projects</a>
+        <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <!-- About Section -->
+    <section id="about" class="fade-in">
+      <h2>About</h2>
+      <div class="about-content">
+        <div class="intro">
+          <h1>Hi, I'm barely-a-dev</h1>
+          <p id="user-bio">I'm just an average Rust developer with a lack of self-confidence.</p>
+        </div>
+        <div class="stats">
+          <div class="stat-card">
+            <h3>Repositories</h3>
+            <p id="repo-count">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Followers</h3>
+            <p id="follower-count">0</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="fade-in">
+      <h2>Projects</h2>
+      <div id="projects-container" class="projects-grid">
+        <!-- Project cards will be inserted here dynamically -->
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="fade-in">
+      <h2>Contact</h2>
+      <div class="contact-info">
+        <p>
+          <i class="fas fa-envelope"></i>
+          <a href="mailto:barely.a.d3v@gmail.com">barely.a.d3v@gmail.com</a>
+        </p>
+        <p>
+          <i class="fab fa-youtube"></i>
+          <a href="https://www.youtube.com/@barelyadev3loper" target="_blank">YouTube Channel</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 barely-a-dev. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fetch GitHub user info
+      fetch('https://api.github.com/users/barely-a-dev')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('user-bio').textContent =
+            data.bio || 'Passionate developer building awesome projects.';
+          document.getElementById('repo-count').textContent = data.public_repos;
+          document.getElementById('follower-count').textContent = data.followers;
+        })
+        .catch(err => console.error('Failed to fetch user info:', err));
+
+      // Fetch GitHub repositories
+      fetch('https://api.github.com/users/barely-a-dev/repos')
+        .then(response => response.json())
+        .then(repos => {
+          // Filter out forks and sort by star count descending
+          repos = repos.filter(repo => !repo.fork);
+          repos.sort((a, b) => b.stargazers_count - a.stargazers_count);
+          const projectsContainer = document.getElementById('projects-container');
+          // Limit to 6 projects
+          repos.slice(0, 6).forEach(repo => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            card.innerHTML = `
+              <h3>${repo.name}</h3>
+              <p>${repo.description || 'No description provided.'}</p>
+              <div class="project-stats">
+                <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
+                <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
+              </div>
+              <a href="${repo.html_url}" target="_blank" class="project-link">
+                <i class="fas fa-external-link-alt"></i> View on GitHub
+              </a>
+            `;
+            projectsContainer.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Failed to fetch repositories:', err));
+
+      // Intersection Observer for fade-in effects
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+      document.querySelectorAll('.fade-in').forEach(section => {
+        observer.observe(section);
+      });
+    });
+  </script>
+</body>
+</html>
