@@ -97,7 +97,7 @@
         .then(response => response.json())
         .then(repos => {
           // Filter out forks and sort by star count descending
-          repos = repos.filter(repo => !repo.fork);
+          repos = repos.filter(repo => !repo.fork && repo.name != "barely-a-dev.github.io");
           repos.sort((a, b) => b.stargazers_count - a.stargazers_count);
           const projectsContainer = document.getElementById('projects-container');
           // Limit to 6 projects
